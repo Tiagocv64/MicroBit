@@ -57,7 +57,7 @@ public class ListAdapter extends ArrayAdapter<App> {
                     SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.app_name), Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putBoolean(mlistApps.get(position).getPackage(), b);
-                    editor.commit();
+                    editor.apply();
                 }
             }
         });

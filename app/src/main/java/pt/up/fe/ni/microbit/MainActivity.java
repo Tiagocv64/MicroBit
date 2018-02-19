@@ -1,5 +1,6 @@
 package pt.up.fe.ni.microbit;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +12,10 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,6 +35,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
+
+        //Bluetooth scanner
+
         final PackageManager pm = getPackageManager();
         //get a list of installed apps.
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -40,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         for (ApplicationInfo packageInfo : packages) {
-            if( pm.getLaunchIntentForPackage(packageInfo.packageName) != null ){
+            if (pm.getLaunchIntentForPackage(packageInfo.packageName) != null) {
                 String packageName = packageInfo.packageName;
-                if(!sharedPref.contains(packageName)){
+                if (!sharedPref.contains(packageName)) {
                     editor.putBoolean(packageName, true);
                     Log.d("SHAREDPREF", "Adding new item: " + packageName);
                 }
@@ -52,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 apps.add(new App(icon, name, packageName, active));
             }
         }
-        editor.commit();
+        editor.apply();
         Collections.sort(apps, new Comparator<App>() {
             @Override
             public int compare(App app, App t1) {
@@ -60,10 +70,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ListView listView = (ListView)findViewById(R.id.apps_list_view);
+        ListView listView = (ListView) findViewById(R.id.apps_list_view);
         ListAdapter appsAdapter = new ListAdapter(this, R.layout.item_view, apps);
         listView.setAdapter(appsAdapter);
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_menu, menu);
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            menu.findItem(R.id.action_bluetooth).setEnabled(false);
+        }
+        return super.onCreateOptionsMenu(menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.action_bluetooth:
+                BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (!mBluetoothAdapter.isEnabled()) {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, 6464);
+                }
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //Bluetooth activated
+        if (requestCode == 6464){
+            if (resultCode == RESULT_OK){
+
+            }
+        }
+    }
+
+
 }
 
