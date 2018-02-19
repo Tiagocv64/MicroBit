@@ -10,10 +10,14 @@ public class App {
 
     private Drawable mIcon;
     private String mName;
+    private String mPackage;
+    private Boolean mActive;
 
-    public  App (Drawable icon, String name){
-        mIcon = icon;
-        mName = name;
+    public  App (Drawable micon, String mname, String mpackage, Boolean mactive){
+        mIcon = micon;
+        mName = mname;
+        mPackage = mpackage;
+        mActive = mactive;
     }
 
     public Drawable getIcon(){
@@ -22,5 +26,17 @@ public class App {
 
     public String getName(){
         return this.mName;
+    }
+
+    public  String getPackage(){
+        return this.mPackage;
+    }
+
+    public Boolean getActive(){
+        return this.mActive;
+    }
+
+    public void setActive(Boolean bool){
+        this.mActive = bool;
     }
 }

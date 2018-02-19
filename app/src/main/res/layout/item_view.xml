@@ -28,7 +28,7 @@
         android:text="This is the name of a app" />
 
     <Switch
-        android:id="@+id/switch1"
+        android:id="@+id/switch_app"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
