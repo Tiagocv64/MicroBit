@@ -53,7 +53,7 @@ public class ListAdapter extends ArrayAdapter<App> {
                 if (buttonView.isPressed()){
                     mlistApps.get(position).setActive(b);
                     MainActivity.apps.get(position).setActive(b);
-                    Log.e("CHANGED", mlistApps.get(position).getPackage() + ": " + b);
+                    Log.d("CHANGED", mlistApps.get(position).getPackage() + ": " + b);
                     SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.app_name), Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putBoolean(mlistApps.get(position).getPackage(), b);
