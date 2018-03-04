@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         boolean hasAccess = flat != null && flat.contains(cn.flattenToString());
 
         //If it doesn't, ask for it
-        if (!hasAccess){
+        if (!hasAccess) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Allow notification access to MicroBit?");
             builder.setMessage("In order to Microbit be able to send notifications to the server, it will need this permission. Microbit will be able to read all notifications, including personal information such as contact names and the text of messages you receive.");
@@ -114,10 +114,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_menu, menu);
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            menu.findItem(R.id.action_bluetooth).setEnabled(false);
-        }
         return super.onCreateOptionsMenu(menu);
 
     }
@@ -125,14 +121,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_bluetooth:
                 BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (!mBluetoothAdapter.isEnabled()) {
+                if (mBluetoothAdapter == null) {
+                    Toast.makeText(this, "Device doesn't support Bluetooth", Toast.LENGTH_SHORT).show();
+                } else if (!mBluetoothAdapter.isEnabled()) {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, 6464);
+                } else {
+                    startService(new Intent(this, ForegroundService.class));
                 }
-                startService(new Intent(this,ForegroundService.class));
                 return true;
 
             case R.id.device_bluetooth:
@@ -175,10 +174,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_help:
                 AlertDialog.Builder helpBuilder = new AlertDialog.Builder(this);
                 helpBuilder.setTitle("Instructions");
-                helpBuilder.setMessage("1: Accept the notifications access permission\n"  +
-                        "2: Turn Bluetooth ON on both devices (this one and the server which as installed ServerMicrobit)\n" +
+                helpBuilder.setMessage("1: Accept the notifications access permission\n" +
+                        "2: Turn Bluetooth ON on both devices (this one and the server which has installed ServerMicrobit)\n" +
                         "3: Input the Bluetooth address of the server in the textbox that appears when you click on the middle icon in the toolbar\n" +
-                        "4: Start the server and try to connect to it (3º icon in the toolbar)");
+                        "4: Start the server in the other device and try to connect to it (3º icon in the toolbar)");
                 helpBuilder.show();
                 return true;
 
@@ -191,9 +190,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         //Bluetooth activated
-        if (requestCode == 6464){
-            if (resultCode == RESULT_OK){
-                startService(new Intent(this,ForegroundService.class));
+        if (requestCode == 6464) {
+            if (resultCode == RESULT_OK) {
+                startService(new Intent(this, ForegroundService.class));
+            } else {
+                Toast.makeText(getBaseContext(), "Service needs bluetooth enabled. Service stopped", Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -15,6 +15,7 @@ import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.IntDef;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,9 +50,12 @@ public class ForegroundService extends NotificationListenerService {
         }
 
         adapter = BluetoothAdapter.getDefaultAdapter();
-        if ((adapter == null) || (!adapter.isEnabled()))
+        if ((adapter == null) || (!adapter.isEnabled())) {
+            Toast.makeText(getApplicationContext(), "Microbit: Bluetooth not enabled", Toast.LENGTH_SHORT).show();
             return super.onStartCommand(intent, flags, startId);
+        }
 
+        Toast.makeText(getApplicationContext(), "Microbit: Trying to connect to " + bluetooth_device_MAC, Toast.LENGTH_SHORT).show();
 
         try {
             // Find the remote device
@@ -70,9 +74,11 @@ public class ForegroundService extends NotificationListenerService {
             outStream = socket.getOutputStream();
             inStream = socket.getInputStream();
 
+            Toast.makeText(getApplicationContext(), "Microbit: Successfully connected to " + bluetooth_device_MAC, Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Connected successfully to " + bluetooth_device_MAC + ".");
 
         } catch (Exception e){
+            Toast.makeText(getApplicationContext(), "Microbit: Failed to connect to " + bluetooth_device_MAC, Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Connection creation failed ");
             socket = null;
         }
@@ -86,7 +92,7 @@ public class ForegroundService extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         Log.d(TAG, "Received Notification");
         if (socket != null) {
-            //if (getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).getBoolean(sbn.getPackageName(), false)) {          TODO
+            if (getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).getBoolean(sbn.getPackageName(), false)) {
                 Bundle extras = sbn.getNotification().extras;
                 Log.d(TAG, "Package: " + sbn.getPackageName());
 
@@ -103,7 +109,7 @@ public class ForegroundService extends NotificationListenerService {
                 } catch (Exception e) {
                     Log.e(TAG, "Write failed!");
                 }
-            //}
+            }
         }
     }
 
